@@ -1,5 +1,6 @@
 package com.project.princeps.princeps_finance_bot.service;
 
+import com.project.princeps.princeps_finance_bot.components.Buttons;
 import com.project.princeps.princeps_finance_bot.config.BotConfig;
 import com.project.princeps.princeps_finance_bot.utils.BotUtils;
 import org.slf4j.Logger;
@@ -11,9 +12,8 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.commands.BotCommand;
 import org.telegram.telegrambots.meta.api.objects.commands.scope.BotCommandScopeDefault;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardButton;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.util.ArrayList;
@@ -24,35 +24,53 @@ public class TelegramBot extends TelegramLongPollingBot {
 
     BotConfig config;
 
+    Buttons buttons;
+
     public static final Logger logger = LoggerFactory.getLogger(TelegramBot.class);
 
-    ReplyKeyboardMarkup replyKeyboardMarkup = new ReplyKeyboardMarkup();
+    InlineKeyboardMarkup markup = new InlineKeyboardMarkup();
 
     public TelegramBot(BotConfig config) {
         this.config = config;
 
-        List<KeyboardRow> keyboard = new ArrayList<>();
+        List<List<InlineKeyboardButton>> rows = new ArrayList<>();
+        List<InlineKeyboardButton> firstRow = new ArrayList<>();
+        List<InlineKeyboardButton> secondRow = new ArrayList<>();
+        List<InlineKeyboardButton> thirdRow = new ArrayList<>();
 
-        KeyboardRow row1 = new KeyboardRow();
-        KeyboardRow row2 = new KeyboardRow();
-        KeyboardRow row3 = new KeyboardRow();
+        InlineKeyboardButton helpButton = new InlineKeyboardButton(BotUtils.HELP_EMOJI + "\tПомощь");
+        helpButton.setCallbackData("HELP_BUTTON");
+        InlineKeyboardButton balanceButton = new InlineKeyboardButton(BotUtils.BALANCE + "\tБаланс");
+        balanceButton.setCallbackData("BALANCE_BUTTON");
+        InlineKeyboardButton incomeButton = new InlineKeyboardButton(BotUtils.INCOME + "\tДоход");
+        incomeButton.setCallbackData("INCOME_BUTTON");
+        InlineKeyboardButton expenseButton = new InlineKeyboardButton(BotUtils.EXPENSE + "\tРасход");
+        expenseButton.setCallbackData("EXPENSE_BUTTON");
+        InlineKeyboardButton budgetButton = new InlineKeyboardButton(BotUtils.BUDGET + "\tБюджет");
+        budgetButton.setCallbackData("BUDGET_BUTTON");
+        InlineKeyboardButton reportButton = new InlineKeyboardButton(BotUtils.REPORT + "\tОтчёт");
+        reportButton.setCallbackData("REPORT_BUTTON");
+        InlineKeyboardButton notificationButton = new InlineKeyboardButton(BotUtils.BELL_EMOJI + "\tУведомления");
+        notificationButton.setCallbackData("NOTIFICATION_BUTTON");
+        InlineKeyboardButton settingsButton = new InlineKeyboardButton(BotUtils.SETTINGS + "\tНастройки");
+        settingsButton.setCallbackData("SETTINGS_BUTTON");
 
-        row1.add(new KeyboardButton("Помощь"));
-        row1.add(new KeyboardButton("Баланс"));
-        row2.add(new KeyboardButton("Доход"));
-        row2.add(new KeyboardButton("Расход"));
-        row2.add(new KeyboardButton("Бюджет"));
-        row3.add(new KeyboardButton("Отчёт"));
-        row3.add(new KeyboardButton("Уведомления"));
-        row3.add(new KeyboardButton("Настройки"));
+        firstRow.add(helpButton);
+        firstRow.add(budgetButton);
 
-        keyboard.add(row1);
-        keyboard.add(row2);
-        keyboard.add(row3);
+        secondRow.add(incomeButton);
+        secondRow.add(expenseButton);
+        secondRow.add(budgetButton);
 
-        replyKeyboardMarkup.setResizeKeyboard(true);
-        replyKeyboardMarkup.setSelective(true);
-        replyKeyboardMarkup.setKeyboard(keyboard);
+        thirdRow.add(reportButton);
+        thirdRow.add(notificationButton);
+        thirdRow.add(settingsButton);
+
+        rows.add(firstRow);
+        rows.add(secondRow);
+        rows.add(thirdRow);
+
+        markup.setKeyboard(rows);
 
         List<BotCommand> botCommandList = new ArrayList<>();
         botCommandList.add(new BotCommand("/start", "get a start message"));
@@ -82,7 +100,16 @@ public class TelegramBot extends TelegramLongPollingBot {
                     sendMessage(chatId, BotUtils.GREETING, "HTML");
                     break;
                 case "Помощь":
-                    sendMessage(chatId, BotUtils.HELP, "HTML");
+                    sendMessage(chatId, BotUtils.HELP_TEXT, "HTML");
+                    break;
+            }
+        }
+        else if (update.hasCallbackQuery()) {
+            String callData = update.getCallbackQuery().getData();
+            long chatId = update.getCallbackQuery().getMessage().getChatId();
+            switch (callData) {
+                case "HELP_BUTTON":
+                    sendMessage(chatId, BotUtils.HELP_TEXT, "HTML");
                     break;
             }
         }
@@ -94,7 +121,7 @@ public class TelegramBot extends TelegramLongPollingBot {
         message.setText(text);
         message.enableHtml(true);
         message.setParseMode(parseMode);
-        message.setReplyMarkup(replyKeyboardMarkup);
+        message.setReplyMarkup(markup);
 
         try {
             execute(message);
