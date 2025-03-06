@@ -11,6 +11,9 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.commands.BotCommand;
 import org.telegram.telegrambots.meta.api.objects.commands.scope.BotCommandScopeDefault;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardButton;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.util.ArrayList;
@@ -23,18 +26,40 @@ public class TelegramBot extends TelegramLongPollingBot {
 
     public static final Logger logger = LoggerFactory.getLogger(TelegramBot.class);
 
+    ReplyKeyboardMarkup replyKeyboardMarkup = new ReplyKeyboardMarkup();
+
     public TelegramBot(BotConfig config) {
         this.config = config;
+
+        List<KeyboardRow> keyboard = new ArrayList<>();
+
+        KeyboardRow row1 = new KeyboardRow();
+        KeyboardRow row2 = new KeyboardRow();
+        KeyboardRow row3 = new KeyboardRow();
+
+        row1.add(new KeyboardButton("Помощь"));
+        row1.add(new KeyboardButton("Баланс"));
+        row2.add(new KeyboardButton("Доход"));
+        row2.add(new KeyboardButton("Расход"));
+        row2.add(new KeyboardButton("Бюджет"));
+        row3.add(new KeyboardButton("Отчёт"));
+        row3.add(new KeyboardButton("Уведомления"));
+        row3.add(new KeyboardButton("Настройки"));
+
+        keyboard.add(row1);
+        keyboard.add(row2);
+        keyboard.add(row3);
+
+        replyKeyboardMarkup.setResizeKeyboard(true);
+        replyKeyboardMarkup.setSelective(true);
+        replyKeyboardMarkup.setKeyboard(keyboard);
+
         List<BotCommand> botCommandList = new ArrayList<>();
         botCommandList.add(new BotCommand("/start", "get a start message"));
-        botCommandList.add(new BotCommand("/help", "get a help info"));
-
         try {
-            this.execute(new SetMyCommands(botCommandList, new BotCommandScopeDefault(), null));
-
-        } catch (TelegramApiException e) {
-            logger.error(e.getMessage());
+            execute(new SetMyCommands(botCommandList, new BotCommandScopeDefault(), null));
         }
+        catch (Exception e) {}
     }
 
     @Override
@@ -56,7 +81,7 @@ public class TelegramBot extends TelegramLongPollingBot {
                 case "/start":
                     sendMessage(chatId, BotUtils.GREETING, "HTML");
                     break;
-                case "/help":
+                case "Помощь":
                     sendMessage(chatId, BotUtils.HELP, "HTML");
                     break;
             }
@@ -69,6 +94,7 @@ public class TelegramBot extends TelegramLongPollingBot {
         message.setText(text);
         message.enableHtml(true);
         message.setParseMode(parseMode);
+        message.setReplyMarkup(replyKeyboardMarkup);
 
         try {
             execute(message);
@@ -76,5 +102,4 @@ public class TelegramBot extends TelegramLongPollingBot {
             logger.error(e.getMessage());
         }
     }
-
 }
