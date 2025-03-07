@@ -6,6 +6,20 @@ import org.springframework.stereotype.Component;
 @Component
 public class BotUtils {
 
+    /** Emojis **/
+    public static final String BELL_EMOJI = EmojiParser.parseToUnicode(":bell:");
+    public static final String EXPENSE = EmojiParser.parseToUnicode(":chart_with_downwards_trend:");
+    public static final String INCOME = EmojiParser.parseToUnicode(":chart_with_upwards_trend:");
+    public static final String BUDGET = EmojiParser.parseToUnicode(":money_with_wings:");
+    public static final String HELP_EMOJI = EmojiParser.parseToUnicode(":book:");
+    public static final String BALANCE = EmojiParser.parseToUnicode(":bank:");
+    public static final String REPORT = EmojiParser.parseToUnicode(":bar_chart:");
+    public static final String SETTINGS = EmojiParser.parseToUnicode(":gear:");
+    public static final String HAMMER = EmojiParser.parseToUnicode(":hammer_and_wrench:");
+    public static final String WINK = EmojiParser.parseToUnicode(":wink:");
+    public static final String MARK = EmojiParser.parseToUnicode(":white_check_mark:");
+    public static final String X = EmojiParser.parseToUnicode(":x:");
+
     public static final String HELP_TEXT = "\uD83D\uDCA1 Команды бота для управления вашими финансами:\n" +
             "\n"+
             "<em><b>Помощь</b></em> — Получить информацию о доступных командах бота (вы сейчас используете эту команду \uD83D\uDE0A).\n" +
@@ -29,13 +43,6 @@ public class BotUtils {
             "Я помогу тебе отслеживать расходы, доходы и планировать бюджет.\n" +
             "Для начала нажми кнопку \"Помощь\", чтобы узнать, как я могу тебе помочь!";
 
-    /** Emojis **/
-    public static final String BELL_EMOJI = EmojiParser.parseToUnicode(":bell:");
-    public static final String EXPENSE = EmojiParser.parseToUnicode(":chart_with_downwards_trend:");
-    public static final String INCOME = EmojiParser.parseToUnicode(":chart_with_upwards_trend:");
-    public static final String BUDGET = EmojiParser.parseToUnicode(":money_with_wings:");
-    public static final String HELP_EMOJI = EmojiParser.parseToUnicode(":book:");
-    public static final String BALANCE = EmojiParser.parseToUnicode(":bank:");
-    public static final String REPORT = EmojiParser.parseToUnicode(":bar_chart:");
-    public static final String SETTINGS = EmojiParser.parseToUnicode(":gear:");
+    public static final String MENU_TEXT = "<em><b>Вот все доступные функции бота!</b></em>: " + HAMMER;
+
 }
