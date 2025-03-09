@@ -1,9 +1,13 @@
 package com.project.princeps.princeps_finance_bot.components;
 
 import com.project.princeps.princeps_finance_bot.utils.BotUtils;
+import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardButton;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,47 +15,52 @@ import java.util.List;
 @Component
 public class Buttons {
 
-    InlineKeyboardMarkup markup = new InlineKeyboardMarkup();
+    ReplyKeyboardMarkup replyKeyboardMarkup = new ReplyKeyboardMarkup();
+    InlineKeyboardMarkup inlineMarkup = new InlineKeyboardMarkup();
 
-    public InlineKeyboardMarkup setMarkup() {
+    public InlineKeyboardMarkup inlineMarkup() {
         List<List<InlineKeyboardButton>> rows = new ArrayList<>();
         List<InlineKeyboardButton> firstRow = new ArrayList<>();
-        List<InlineKeyboardButton> secondRow = new ArrayList<>();
-        List<InlineKeyboardButton> thirdRow = new ArrayList<>();
-
         InlineKeyboardButton helpButton = new InlineKeyboardButton(BotUtils.HELP_EMOJI + "\tПомощь");
         helpButton.setCallbackData("HELP_BUTTON");
-        InlineKeyboardButton balanceButton = new InlineKeyboardButton(BotUtils.BALANCE + "\tБаланс");
-        balanceButton.setCallbackData("BALANCE_BUTTON");
-        InlineKeyboardButton incomeButton = new InlineKeyboardButton(BotUtils.INCOME + "\tДоход");
-        incomeButton.setCallbackData("INCOME_BUTTON");
-        InlineKeyboardButton expenseButton = new InlineKeyboardButton(BotUtils.EXPENSE + "\tРасход");
-        expenseButton.setCallbackData("EXPENSE_BUTTON");
-        InlineKeyboardButton budgetButton = new InlineKeyboardButton(BotUtils.BUDGET + "\tБюджет");
-        budgetButton.setCallbackData("BUDGET_BUTTON");
-        InlineKeyboardButton reportButton = new InlineKeyboardButton(BotUtils.REPORT + "\tОтчёт");
-        reportButton.setCallbackData("REPORT_BUTTON");
-        InlineKeyboardButton notificationButton = new InlineKeyboardButton(BotUtils.BELL_EMOJI + "\tУведомления");
-        notificationButton.setCallbackData("NOTIFICATION_BUTTON");
-        InlineKeyboardButton settingsButton = new InlineKeyboardButton(BotUtils.SETTINGS + "\tНастройки");
-        settingsButton.setCallbackData("SETTINGS_BUTTON");
-
         firstRow.add(helpButton);
-        firstRow.add(budgetButton);
+        rows.add(firstRow);
+        inlineMarkup.setKeyboard(rows);
+        return inlineMarkup;
+    }
 
+    @Bean
+    public ReplyKeyboardMarkup replyMarkup() {
+
+        List<KeyboardRow> rows = new ArrayList<>();
+
+        KeyboardButton balanceButton = new KeyboardButton(BotUtils.BALANCE + "\tБаланс");
+        KeyboardButton incomeButton = new KeyboardButton(BotUtils.INCOME + "\tДоход");
+        KeyboardButton expenseButton = new KeyboardButton(BotUtils.EXPENSE + "\tРасход");
+        KeyboardButton budgetButton = new KeyboardButton(BotUtils.BUDGET + "\tБюджет");
+        KeyboardButton reportButton = new KeyboardButton(BotUtils.REPORT + "\tОтчёт");
+        KeyboardButton notificationButton = new KeyboardButton(BotUtils.BELL_EMOJI + "\tУведомления");
+        KeyboardButton settingsButton = new KeyboardButton(BotUtils.SETTINGS + "\tНастройки");
+
+        KeyboardRow firstRow = new KeyboardRow();
+        firstRow.add(balanceButton);
+
+        KeyboardRow secondRow = new KeyboardRow();
         secondRow.add(incomeButton);
         secondRow.add(expenseButton);
-        secondRow.add(balanceButton);
+        secondRow.add(budgetButton);
 
+        KeyboardRow thirdRow = new KeyboardRow();
         thirdRow.add(reportButton);
         thirdRow.add(notificationButton);
         thirdRow.add(settingsButton);
-
         rows.add(firstRow);
         rows.add(secondRow);
         rows.add(thirdRow);
 
-        markup.setKeyboard(rows);
-        return markup;
+        replyKeyboardMarkup.setResizeKeyboard(true);
+        replyKeyboardMarkup.setKeyboard(rows);
+
+        return replyKeyboardMarkup;
     }
 }
