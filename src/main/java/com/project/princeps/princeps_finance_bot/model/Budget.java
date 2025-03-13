@@ -40,6 +40,7 @@ public class Budget {
     @Column(name = "limit_amount")
     private BigDecimal limitAmount;
 
+    @ColumnDefault("CURRENT_TIMESTAMP")
     @Column(name = "period_begin")
     private Instant periodBegin;
 
