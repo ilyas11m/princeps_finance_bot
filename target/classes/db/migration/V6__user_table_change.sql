@@ -1,1 +1,0 @@
-ALTER TABLE tg_user ALTER COLUMN tg_user_id TYPE BIGINT USING tg_user_id::BIGINT
