@@ -16,6 +16,9 @@ public class TgUserService {
         this.tgUserRepository = tgUserRepository;
     }
 
+    public TgUser findById(long tgUserId) {
+        return tgUserRepository.findByTgUserId(tgUserId).orElse(null);
+    };
 
     @Transactional
     public void addTgUser(TgUser tgUser) {
