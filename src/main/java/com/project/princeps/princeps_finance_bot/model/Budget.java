@@ -6,9 +6,7 @@ import lombok.Data;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
-
-import java.math.BigDecimal;
-import java.time.Instant;
+import java.sql.Timestamp;
 
 @Data
 @Entity
@@ -17,34 +15,27 @@ public class Budget {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "budget_id", nullable = false)
-    private Long budget_id;
+    private Long budgetId;
 
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "user_id", nullable = false)
-    private TgUser user_id;
-
-    @NotNull
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @OnDelete(action = OnDeleteAction.CASCADE)
-    @JoinColumn(name = "category_id", nullable = false)
-    private Category category_id;
+    private TgUser userId;
 
     @NotNull
     @ColumnDefault("0")
     @Column(name = "balance", nullable = false)
-    private BigDecimal balance;
+    private Long balance;
 
     @ColumnDefault("0")
     @Column(name = "limit_amount")
-    private BigDecimal limitAmount;
+    private Long limitAmount;
 
     @ColumnDefault("CURRENT_TIMESTAMP")
     @Column(name = "period_begin")
-    private Instant periodBegin;
+    private Timestamp periodBegin;
 
     @Column(name = "period_end")
-    private Instant periodEnd;
-
+    private Timestamp periodEnd;
 }
