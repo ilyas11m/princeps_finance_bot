@@ -17,7 +17,7 @@ public class TgUser {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id", nullable = false)
-    private Long user_id;
+    private Long userId;
 
     @Size(max = 50)
     @Column(name = "username", length = 50)
@@ -27,7 +27,7 @@ public class TgUser {
     @NotNull
     @Unique
     @Column(name = "tg_user_id", nullable = false, length = 50)
-    private Long tg_user_id;
+    private Long tgUserId;
 
     @NotNull
     @ColumnDefault("CURRENT_TIMESTAMP")
