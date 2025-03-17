@@ -5,7 +5,6 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class BotUtils {
-
     /** Emojis **/
     public static final String BELL_EMOJI = EmojiParser.parseToUnicode(":bell:");
     public static final String EXPENSE = EmojiParser.parseToUnicode(":chart_with_downwards_trend:");
@@ -44,5 +43,7 @@ public class BotUtils {
             "Для начала нажми кнопку \"Помощь\", чтобы узнать, как я могу тебе помочь!";
 
     public static final String MENU_TEXT = "<em><b>Вот все доступные функции бота!</b></em>: " + HAMMER;
+
+    public static final String BUDGET_UPDATE = "<em><b>Установите бюджет бота :)</b></em>";
 
 }
