@@ -16,12 +16,6 @@ public class Category {
 
     @Size(max = 50)
     @NotNull
-    @Column(name = "category_name", nullable = false, length = 50)
-    private String categoryName;
-
-    @Size(max = 50)
-    @NotNull
     @Column(name = "type", nullable = false, length = 50)
     private String type;
-
 }
