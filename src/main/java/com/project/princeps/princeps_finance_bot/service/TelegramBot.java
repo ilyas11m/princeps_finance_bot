@@ -4,6 +4,8 @@ import com.project.princeps.princeps_finance_bot.components.Buttons;
 import com.project.princeps.princeps_finance_bot.config.BotConfig;
 import com.project.princeps.princeps_finance_bot.model.Budget;
 import com.project.princeps.princeps_finance_bot.model.TgUser;
+import com.project.princeps.princeps_finance_bot.states.BotState;
+import com.project.princeps.princeps_finance_bot.states.BudgetData;
 import com.project.princeps.princeps_finance_bot.utils.BotUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +30,7 @@ import java.util.List;
 @Service
 public class TelegramBot extends TelegramLongPollingBot {
 
+
     private final BudgetService budgetService;
 
     private final TgUserService tgUserService;
@@ -36,11 +39,14 @@ public class TelegramBot extends TelegramLongPollingBot {
 
     private final Buttons buttons;
 
-    private HashMap<Long, String> dataState = new HashMap<>();
+    private HashMap<Long, BudgetData> dataState = new HashMap<>();
 
     @Autowired
-    public TelegramBot(BotConfig config, Buttons buttons,
-                       TgUserService tgUserService, BudgetService budgetService) {
+    public TelegramBot( BotConfig config,
+                       Buttons buttons,
+                       TgUserService tgUserService,
+                       BudgetService budgetService) {
+
         this.config = config;
         this.buttons = buttons;
         this.tgUserService = tgUserService;
@@ -73,16 +79,18 @@ public class TelegramBot extends TelegramLongPollingBot {
     public void onUpdateReceived(Update update) {
         if (update.hasMessage() && update.getMessage().hasText()) {
             long chatId = update.getMessage().getChatId();
-            String command = update.getMessage().getText();
-            String balanceButton = "Баланс";
+            String message = update.getMessage().getText();
             Long tgUserId = update.getMessage().getChat().getId();
-            if (command.contains(balanceButton)) {
-                dataState.put(chatId, "balance_response");
-                sendMessage(chatId, BotUtils.BUDGET_UPDATE, "HTML");
-                sendMessage(chatId, "Введите баланс:", null);
+            BudgetData budgetData = dataState.getOrDefault(
+                    chatId, new BudgetData(BotState.DEFAULT, 0L));
+
+            if (message.contains("Баланс")) {
+                sendMessage(chatId,BotUtils.BUDGET + "\t<em><b>Введите ваш текущий баланс:</b></em>","HTML");
+                dataState.put(chatId, new BudgetData(BotState.AWAITING_BALANCE, 0L));
                 return;
             }
-            switch (command) {
+
+            switch (message) {
                 case "/start":
                     sendMessage(chatId, BotUtils.GREETING, "HTML", buttons.inlineMarkup());
                     break;
@@ -93,22 +101,35 @@ public class TelegramBot extends TelegramLongPollingBot {
                     tgUserRegistration(update,time,tgUserId,username);
                     break;
                 default:
-                    if (dataState.containsKey(chatId) && dataState.get(chatId).equals("balance_response")) {
-                        try {
-                            long balance = Long.valueOf(update.getMessage().getText());
-                            long limit = 123;
-                            Timestamp timestamp = Timestamp.from(Instant.now());
-                            budgetCreation(update, tgUserId, balance, limit, timestamp);
-                            dataState.remove(chatId);
-                        } catch (Exception e) {
-                            sendMessage(chatId, "Некорректный ввод!", "HTML");
-                            log.error(e.getMessage());
-                        }
+                    switch (budgetData.getBotState()) {
+                        case AWAITING_BALANCE:
+                            try {
+                                long balance = Long.parseLong(message);
+                                budgetData.setData(balance);
+                                sendMessage(chatId,BotUtils.LIMIT + "\t<em><b>Введите лимит на траты:</b></em>","HTML");
+                                budgetData.setBotState(BotState.AWAITING_LIMIT);
+                            } catch (NumberFormatException e) {
+                                sendMessage(chatId, "Некорректный ввод баланса! Попробуйте снова.", "HTML");
+                                log.error(e.getMessage());
+                            }
+                            break;
+                        case AWAITING_LIMIT:
+                            try {
+                                long limit = Long.parseLong(message);
+                                Timestamp periodBegin = Timestamp.from(Instant.now());
+                                budgetCreation(update, tgUserId, budgetData.getData(), limit, periodBegin);
+                                dataState.remove(chatId);
+                            } catch (NumberFormatException e) {
+                                sendMessage(chatId, "Некорректный ввод лимита! Попробуйте снова.", "HTML");
+                                log.error(e.getMessage());
+                            }
+                            break;
+                        default:
+                            sendMessage(chatId, "Неизвестная команда.", "HTML");
+                            break;
                     }
-                    break;
             }
         }
-
         else if (update.hasCallbackQuery()) {
             String callData = update.getCallbackQuery().getData();
             long chatId = update.getCallbackQuery().getMessage().getChatId();
@@ -164,7 +185,6 @@ public class TelegramBot extends TelegramLongPollingBot {
             log.error(e.getMessage());
         }
     }
-
 
     public void sendMessage(long chatId, String text, String parseMode) {
         SendMessage message = new SendMessage();
